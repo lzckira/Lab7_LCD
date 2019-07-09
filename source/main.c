@@ -53,6 +53,7 @@ enum States {start, LED1, LED2, LED3, wait} state;
 unsigned char flag = 0x01;
 unsigned char tmpB = 0x00;
 unsigned char tmpScore = 0x05;
+unsigned char str[] = "You win!";
 void Tick();
 
 int main(void) {
@@ -81,35 +82,56 @@ void Tick() {
 	    break;
 	case LED1:
 	    if(PINA == 0xFE) {
-		flag = (flag) ? 0x00 : 0x01;
+		state = wait;
 	    }
-	    else if(PINA != 0xFE && flag) {
+	    else if(PINA != 0xFE) {
 		state = LED2;
 	    }
-	    tmpB = 0x01;
 	    break;
 	case LED2:
-		if(PINA == 0xFE) {
-			flag = (flag) ? 0x00 : 0x01;
-		}
-		else if(PINA != 0xFE && flag) {
-			state = LED3;
-		}
-	    tmpB = 0x02;
+	    if(PINA == 0xFE) {
+		state = wait;
+	    }
+	    else if(PINA != 0xFE) {
+		state = LED3;
+	    }
 	    break;
 	case LED3:
 	    if(PINA == 0xFE) {
-		flag = (flag) ? 0x00 : 0x01;
+		state = wait;
 	    }
-	    else if(PINA != 0xFE && flag) {
+	    else if(PINA != 0xFE) {
 		state = LED1;
     	    }
+	    break;
+	case wait:
+	    break;
+	default:
+	    break;
+	}
+    switch(state) {
+	case start:
+	    tmpB = 0x01;
+	    break;
+	case LED1:
+	    tmpB = 0x01;
+	case LED2:
+	    tmpB = 0x02;
+	    break;
+	case LED3:
 	    tmpB = 0x04;
 	    break;
 	case wait:
 	    break;
 	default:
 	    break;
-		    
+	}
+	PORTB = tmpB;
+	if (tmpScore == 0x09) {
+	    LCD_DisplayString(1, str[]);	
+	}
+	else {
+	    LCD_Cursor(1);
+	    LCD_WriteData(tmpScore + '0');
 	}
 }
