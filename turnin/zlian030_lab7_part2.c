@@ -145,6 +145,7 @@ void Tick() {
 	    break;
 	case LED1:
 	    tmpB = 0x01;
+	    break;
 	case LED2:
 	    tmpB = 0x02;
 	    break;
