@@ -83,6 +83,12 @@ void Tick() {
 	case LED1:
 	    if(PINA == 0xFE) {
 		state = wait;
+		if (tmpScore != 0x00) {
+		    tmpScore--;
+		}
+		else {
+		    tmpScore = 0x00;
+		}
 	    }
 	    else if(PINA != 0xFE) {
 		state = LED2;
@@ -91,6 +97,12 @@ void Tick() {
 	case LED2:
 	    if(PINA == 0xFE) {
 		state = wait;
+                if (tmpScore != 0x09) {
+                    tmpScore++;
+                }
+                else {
+                    tmpScore = 0x09;
+                }
 	    }
 	    else if(PINA != 0xFE) {
 		state = LED3;
@@ -99,6 +111,12 @@ void Tick() {
 	case LED3:
 	    if(PINA == 0xFE) {
 		state = wait;
+                if (tmpScore != 0x00) {
+                    tmpScore--;
+                }
+                else {
+                    tmpScore = 0x00;
+                }
 	    }
 	    else if(PINA != 0xFE) {
 		state = LED1;
