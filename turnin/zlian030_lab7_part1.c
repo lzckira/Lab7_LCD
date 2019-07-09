@@ -179,5 +179,5 @@ void Tick() {
     
     
     LCD_Cursor(1);
-    LCD_WriteDate( temp + '0');
+    LCD_WriteData( temp + '0');
 }
