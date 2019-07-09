@@ -1,7 +1,7 @@
 /*	Author: zlian030
  *  Partner(s) Name: 
  *	Lab Section:
- *	Assignment: Lab #7  Exercise #1
+ *	Assignment: Lab #7  Exercise #2
  *	Exercise Description: [optional - include for your own benefit]
  *
  *	I acknowledge all content contained herein, excluding template or example
@@ -49,26 +49,25 @@ void TimerSet(unsigned long M) {
 	_avr_timer_cntcurr = _avr_timer_M;
 }
 
-enum States {start, ADD, ADDwait, SUB, SUBwait, wait, reset} state;
-unsigned char temp = 0x00;
-unsigned char count = 0x00;
-//unsigned char flag = 0x00;
+enum States {start, LED1, LED2, LED3, wait} state;
+unsigned char flag = 0x01;
+unsigned char tmpB = 0x00;
+unsigned char tmpScore = 0x05;
 void Tick();
 
 int main(void) {
-
-    DDRA = 0x00; PORTA = 0xFF; // Configure port A's 8 pins as inputs
+    DDRA = 0x00; PORTA = 0xFF; // Configure port B's 8 pins as inputs
     DDRB = 0xFF; PORTB = 0x00; // Configure port B's 8 pins as outputs, initialize to 0s
     DDRC = 0xFF; PORTC = 0x00; // Configure port C's 8 pins as outputs, initialize to 0s
     DDRD = 0xFF; PORTD = 0x00; // Configure port D's 8 pins as outputs, initialize to 0s
     state = start;
-    TimerSet(12);
+    TimerSet(38);
     TimerOn();
     LCD_init();
     while (1) {
-		while (!TimerFlag);
-		TimerFlag = 0;
-		Tick();
+	Tick();
+	while (!TimerFlag);
+	TimerFlag = 0;
     }
     return 1;
 }
@@ -77,107 +76,40 @@ int main(void) {
 void Tick() {
     switch(state) {
 	case start:
-	    state = wait;
+	    state = LED1;
+	    tmpB = 0x01;
 	    break;
-	case ADD:
-	    state = ADDwait;
+	case LED1:
+	    if(PINA == 0xFE) {
+		flag = (flag) ? 0x00 : 0x01;
+	    }
+	    else if(PINA != 0xFE && flag) {
+		state = LED2;
+	    }
+	    tmpB = 0x01;
 	    break;
-	case ADDwait:
-	    if ((~PINA & 0x01) && (~PINA & 0x02)) {
-                count = 0x00;
-                state = reset;
-	    }
-	    else if (!(~PINA & 0x01) && (~PINA & 0x02)) {
-                count = 0x00;
-                state = SUB;
-	    }
-	    else if (!(~PINA & 0x01) && !(~PINA & 0x02)) {
-                count = 0x00;
-                state = wait;
-	    }
-	    else {
-            	if (count != 0x09) {
-                    count++;
-                    state = ADDwait;
-            	}
-		else {
-                    count = 0x00;
-		    state = ADD;
-                }
-	    }
+	case LED2:
+		if(PINA == 0xFE) {
+			flag = (flag) ? 0x00 : 0x01;
+		}
+		else if(PINA != 0xFE && flag) {
+			state = LED3;
+		}
+	    tmpB = 0x02;
 	    break;
-	case SUB:
-	    state = SUBwait;
-	    break;
-	case SUBwait:
-            if ((~PINA & 0x01) && (~PINA & 0x02)) {
-                count = 0x00;
-                state = reset;
-            }
-            else if (!(~PINA & 0x02) && (~PINA & 0x01)) {
-                count = 0x00;
-                state = ADD;
-            }
-	    else if (!(~PINA & 0x01) && !(~PINA & 0x02)){
-                count = 0x00;
-	        state = wait;
+	case LED3:
+	    if(PINA == 0xFE) {
+		flag = (flag) ? 0x00 : 0x01;
 	    }
-            else {
-                if (count != 0x09) {
-                    count++;
-                    state = SUBwait;
-                }
-		else {
-                    count = 0x00;
-		    state = SUB;
-                }
-            }
-            break;
-    	case wait:
-            if ((~PINA & 0x01) && (~PINA & 0x02)) {
-                state = reset;
-            }
-            else if (!(~PINA & 0x02) && (~PINA & 0x01)) {
-                state = ADD;
-            }
-	    else if (!(~PINA & 0x01) && (~PINA & 0x02)) {
-                state = SUB;
-            }
-	    else {
-	        state = wait;
-	    } 
-            break;
-	case reset:
-	    state = wait;
+	    else if(PINA != 0xFE && flag) {
+		state = LED1;
+    	    }
+	    tmpB = 0x04;
+	    break;
+	case wait:
 	    break;
 	default:
-	    state = wait;
 	    break;
-    }
-
-    switch(state) {
-        case start:
-            break;
-        case ADD:
-            temp = (temp == 0x09) ? 0x09 : (temp + 0x01);
-            break;
-	case ADDwait:
-	    break;
-        case SUB:
-	    temp = (temp == 0x00) ? 0x00 : (temp - 0x01);
-            break;
-	case SUBwait:
-	    break;
-        case wait:
-            break;
-	case reset:
-	    temp = 0x00;
-	    break;
-        default:
-            break;
-    }
-    
-    
-    LCD_Cursor(1);
-    LCD_WriteDate( temp + '0');
+		    
+	}
 }
