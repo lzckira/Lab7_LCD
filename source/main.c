@@ -84,67 +84,69 @@ void Tick() {
 	    break;
 	case ADDwait:
 	    if ((~PINA & 0x01) && (~PINA & 0x02)) {
-            count = 0x00;
-            state = reset;
+                count = 0x00;
+                state = reset;
 	    }
 	    else if (!(~PINA & 0x01) && (~PINA & 0x02)) {
-            count = 0x00;
-            state = SUB;
+                count = 0x00;
+                state = SUB;
 	    }
 	    else if (!(~PINA & 0x01) && !(~PINA & 0x02)) {
-            count = 0x00;
-            state = wait;
+                count = 0x00;
+                state = wait;
 	    }
 	    else {
-            if (count != 0x09) {
-                count++;
-                state = ADDwait;
-            else {
-                count = 0x00;
-		        state = ADD;
-            }
+            	if (count != 0x09) {
+                    count++;
+                    state = ADDwait;
+            	}
+		else {
+                    count = 0x00;
+		    state = ADD;
+                }
 	    }
 	    break;
 	case SUB:
 	    state = SUBwait;
 	    break;
 	case SUBwait:
-        if ((~PINA & 0x01) && (~PINA & 0x02)) {
-            count = 0x00;
-            state = reset;
-        }
-        else if (!(~PINA & 0x02) && (~PINA & 0x01)) {
-            count = 0x00;
-            state = ADD;
-        }
-	    else if (!(~PINA & 0x01) && !(~PINA & 0x02)){
-            count = 0x00;
-		    state = wait;
-	    }
-        else {
-            if (count != 0x09) {
-                count++;
-                state = SUBwait;
-            else {
+            if ((~PINA & 0x01) && (~PINA & 0x02)) {
                 count = 0x00;
-		        state = SUB;
+                state = reset;
             }
-        }
+            else if (!(~PINA & 0x02) && (~PINA & 0x01)) {
+                count = 0x00;
+                state = ADD;
+            }
+	    else if (!(~PINA & 0x01) && !(~PINA & 0x02)){
+                count = 0x00;
+	        state = wait;
+	    }
+            else {
+                if (count != 0x09) {
+                    count++;
+                    state = SUBwait;
+                }
+		else {
+                    count = 0x00;
+		    state = SUB;
+                }
+            }
             break;
-    case wait:
-        if ((~PINA & 0x01) && (~PINA & 0x02)) {
-            state = reset;
-        }
-        else if (!(~PINA & 0x02) && (~PINA & 0x01)) {
-            state = ADD;
-        }
+    	case wait:
+            if ((~PINA & 0x01) && (~PINA & 0x02)) {
+                state = reset;
+            }
+            else if (!(~PINA & 0x02) && (~PINA & 0x01)) {
+                state = ADD;
+            }
 	    else if (!(~PINA & 0x01) && (~PINA & 0x02)) {
-            state = SUB;
-        }
+                state = SUB;
+            }
 	    else {
-		    state = wait;
+	        state = wait;
 	    } 
-        break;
+            break;
 	case reset:
 	    state = wait;
 	    break;
@@ -159,18 +161,18 @@ void Tick() {
         case ADD:
             temp = (temp == 0x09) ? 0x09 : (temp + 0x01);
             break;
-		case ADDwait:
-			break;
+	case ADDwait:
+	    break;
         case SUB:
-			temp = (temp == 0x00) ? 0x00 : (temp - 0x01);
+	    temp = (temp == 0x00) ? 0x00 : (temp - 0x01);
             break;
-		case SUBwait:
-			break;
+	case SUBwait:
+	    break;
         case wait:
             break;
-		case reset:
-	        temp = 0x00;
-	        break;
+	case reset:
+	    temp = 0x00;
+	    break;
         default:
             break;
     }
